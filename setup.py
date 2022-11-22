@@ -6,7 +6,7 @@ with open("README.rst") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "appdirs", "cachetools", "defusedxml", "lxml", "napalm", "netboxapi @ git+git@github.com:onecorp-gmbh/python-netboxapi.git",
+    "appdirs", "cachetools", "defusedxml", "lxml", "napalm", "netboxapi @ git+ssh://git@github.com:onecorp-gmbh/python-netboxapi.git",
     "simplejson", "tqdm"
 ]
 setup_requirements = [
