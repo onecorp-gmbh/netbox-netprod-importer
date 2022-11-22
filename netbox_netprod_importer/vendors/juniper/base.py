@@ -118,7 +118,11 @@ class JunOSParser(JuniperParser):
 
         for p in ports_info.getchildren():
             if int(p.xpath("port-number")[0].text) == port_index:
-                return p.xpath("sfp-vendor-pno")[0].text
+                pno = p.xpath("sfp-vendor-pno")[0].text
+                if pno is None:
+                  raise TypeCouldNotBeParsedError(interface)
+                
+                return pno
 
         raise TypeCouldNotBeParsedError(interface)
 
@@ -145,19 +149,28 @@ class JunOSParser(JuniperParser):
         parsed_xml = defusedxml.lxml.fromstring(lldp_neighbours_xml)
 
         for n in parsed_xml.xpath(".//lldp-neighbor-information"):
+            local_port = n.xpath("lldp-local-interface")
+            remote_name = n.xpath("lldp-remote-system-name")
+            remote_port = n.xpath("lldp-remote-port-description")
+
+            if len(local_port) == 0:
+                local_port = n.xpath("lldp-local-port-id")
+
+            if len(remote_name) == 0:
+                remote_name = n.xpath("lldp-remote-chassis-id")
+
+            if len(remote_port) == 0:
+                remote_port = n.xpath("lldp-remote-port-id")
+            
             yield {
                 "local_port": (
-                    n.xpath(
-                        "lldp-local-interface"
-                    )[0].text.split(".")[0].strip()
+                    local_port[0].text.split(".")[0].strip()
                 ),
                 "hostname": (
-                    n.xpath("lldp-remote-system-name")[0].text.strip()
+                    remote_name[0].text.strip()
                 ),
                 "port": (
-                    n.xpath(
-                        "lldp-remote-port-description"
-                    )[0].text.split(".")[0].strip()
+                    remote_port[0].text.split(".")[0].strip()
                 ),
                 "chassis_id": (
                     n.xpath("lldp-remote-chassis-id")[0].text.strip()
