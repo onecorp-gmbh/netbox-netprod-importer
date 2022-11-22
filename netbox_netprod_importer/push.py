@@ -354,7 +354,7 @@ class NetboxDevicePropsPusher(_NetboxPusher):
 
         for ip_key in ("primary_ip4", "primary_ip6"):
             ip = self.props.get(ip_key)
-            if ip:
+            if ip and not ip.startswith("::ffff:"):
                 try:
                     ip_netbox_obj = next(mapper.get(q=ip))
                     try:
