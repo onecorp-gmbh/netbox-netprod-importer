@@ -139,6 +139,9 @@ class DeviceImporter(ContextDecorator):
         trunks = []
         # sort to test it more easily
         for ifname, napalm_ifprops in sorted(napalm_interfaces.items()):
+            if ifname in ["jsrv", "bme0", "bme1", "em0", "em1", "em2"]:
+                logger.debug("Skipping management interface %s", ifname)
+                continue
             is_subif, parent_if = self._is_subinterface(ifname)
             if is_subif:
                 trunks.append(parent_if)

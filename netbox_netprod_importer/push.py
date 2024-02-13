@@ -216,8 +216,8 @@ class NetboxDevicePropsPusher(_NetboxPusher):
                 addrs = self._attach_interface_to_ip_addresses(
                     interface, *if_prop["ip"]
                 )
-                if self.overwrite:
-                    self._clean_unmatched_ip_addresses(interface, *addrs)
+                #if self.overwrite:
+                #    self._clean_unmatched_ip_addresses(interface, *addrs)
 
         self._update_interfaces_lag(interfaces, interfaces_lag)
 
@@ -269,12 +269,16 @@ class NetboxDevicePropsPusher(_NetboxPusher):
         addresses = []
 
         link_local_v6 = ip_network("fe80::/10")
+        link_local_v4 = ip_network("127.0.0.0/8")
 
         for ip in ip_addresses:
             if ip_interface(ip).ip in link_local_v6:
                 # Skip IPv6 link local addresses
                 continue
-
+            if ip_interface(ip).ip in link_local_v4:
+                # Skip IPv4 link local addresses
+                continue
+            
             # check if ip attached isn't already correct
             try:
                 ip_netbox_obj = next(mapper.get(q=ip, interface_id=netbox_if))
